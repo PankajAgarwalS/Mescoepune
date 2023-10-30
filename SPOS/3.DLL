@@ -1,4 +1,6 @@
-ava -Djava.ltbrary.path= .B1
+javac B1.java
+
+java -Djava.ltbrary.path= .B1
 import java.io.*;
 import java.util.*;
 
