@@ -1,48 +1,46 @@
-class LRUCache:
-    def __init__(self, capacity):
-        self.cache = {}
-        self.order = []
-        self.capacity = capacity
-        self.page_hits = 0
-        self.page_faults = 0
+class Page:
+    def __init__(self, page_number):
+        self.page_number = page_number
+        self.referenced = 0
 
-    def refer(self, page_number):
-        if page_number in self.cache:
-            # Page hit: Move the page to the end to mark it as most recently used
-            self.order.remove(page_number)
-            self.order.append(page_number)
-            self.page_hits += 1
-        else:
-            # Page fault: Check if the cache is full
-            if len(self.cache) >= self.capacity:
-                # Remove the least recently used page (first item in order list)
-                removed_page = self.order.pop(0)
-                del self.cache[removed_page]
-            # Add the new page to the cache and order list
-            self.cache[page_number] = None
-            self.order.append(page_number)
-            self.page_faults += 1
+def lru(pages, page_frames):
+    page_table = {}
+    page_order = []
 
-    def display_cache_contents(self):
-        print("LRU Cache Contents:", end=" ")
-        for page_number in self.order:
-            print(page_number, end=" ")
-        print("\n")
-
-    def display_page_counters(self):
-        print(f"Page Hits: {self.page_hits}")
-        print(f"Page Faults: {self.page_faults}")
-
-
-if __name__ == "__main__":
-    # User input for pages and cache size
-    pages = list(map(int, input("Enter the sequence of page references (space-separated): ").split()))
-    cache_size = int(input("Enter the cache size: "))
-
-    lru_cache = LRUCache(cache_size)
+    page_faults = 0
+    page_hits = 0
 
     for page_number in pages:
-        lru_cache.refer(page_number)
-        lru_cache.display_cache_contents()
+        if page_number in page_table:
+            page_hits += 1
+            page_table[page_number].referenced += 1
+            # Move the accessed page to the end to represent it's the most recently used
+            page_order.remove(page_table[page_number])
+            page_order.append(page_table[page_number])
+        else:
+            page_faults += 1
 
-    lru_cache.display_page_counters()
+            if len(page_table) == page_frames:
+                # Remove the least recently used page (at the front of the list)
+                removed_page = page_order.pop(0)
+                del page_table[removed_page.page_number]
+
+            new_page = Page(page_number)
+            page_table[page_number] = new_page
+            page_order.append(new_page)
+
+        print(f"Cache after inserting page {page_number}: {[page.page_number for page in page_order]}")
+        print(f"Hits: {page_hits}, Faults: {page_faults}\n")
+
+    total_hits_and_faults = {"Hits": page_hits, "Faults": page_faults}
+    return total_hits_and_faults
+
+if __name__ == "__main__":
+    pages_input = input("Enter the sequence of pages (space-separated): ")
+    pages = [int(page) for page in pages_input.split()]
+
+    page_frames = int(input("Enter the number of page frames: "))
+
+    total_hits_and_faults = lru(pages, page_frames)
+
+    print(f"Total Hits: {total_hits_and_faults['Hits']}, Total Faults: {total_hits_and_faults['Faults']}")
