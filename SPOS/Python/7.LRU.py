@@ -44,3 +44,4 @@ if __name__ == "__main__":
     total_hits_and_faults = lru(pages, page_frames)
 
     print(f"Total Hits: {total_hits_and_faults['Hits']}, Total Faults: {total_hits_and_faults['Faults']}")
+    print(f"Hit Ratio: {total_hits_and_faults['Hits'] / len(pages)}")
