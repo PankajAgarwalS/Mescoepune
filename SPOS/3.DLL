@@ -1,6 +1,11 @@
 javac B1.java
 javah B1
-gcc -shared -o B1.dll -I"<path to JDK>\include" -I"<path to JDK>\include\win32" B1.c
+
+sudo update-alternatives --config java
+export JAVA_HOME=/path/to/your/jdk change path to above obtained address
+source ~/.bashrc
+
+gcc -shared -o libB1.so -I"$JAVA_HOME/include" -I"$JAVA_HOME/include/linux" B1.c
 java -Djava.library.path=. B1
 
 
