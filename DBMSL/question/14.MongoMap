@@ -87,17 +87,16 @@ db.Employee.insert([
     );
 
     // Query 5: Return count for city Pune and age greater than 40.
-    db.Employee.mapReduce(
-        function () {
-            this.Address.forEach(function (addr) {
-                if (addr.PAddr === "Pune" && this.Age > 40) {
-                    emit("City=Pune, Age>40", 1);
-                }
-            });
-        },
-        function (key, values) {
-            return Array.sum(values);
-        },
-        { out: "CountCityPuneAge40Plus", finalize: null }
-    );
+db.Employee.mapReduce(
+    function () {
+        // Check if there is an address in Pune and age > 40
+        if (this.Address[0].PAddr === "Pune" && this.Age > 40) {
+            emit("City=Pune, Age>40", 1);
+        }
+    },
+    function (key, values) {
+        return Array.sum(values);
+    },
+    { out: "CountCityPuneAge40Plus_NoForEach_MR", finalize: null }
+);
 ]);
